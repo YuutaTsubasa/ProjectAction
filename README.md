@@ -1,0 +1,26 @@
+# ProjectAction
+
+## Code Convention Checking System
+This repository uses `.editorconfig` plus Roslyn analyzers to keep C# style and naming consistent across Unity scripts.
+
+### Local setup
+1. Open the project once in Unity to generate the solution and project files.
+2. Install the local tools:
+   - `dotnet tool restore`
+3. Run the checks:
+   - `dotnet format ProjectAction.sln --verify-no-changes --severity warn`
+
+### Before opening a PR
+- Run the command above and fix all diagnostics it reports.
+- If you changed `.editorconfig` or analyzer settings, rerun the checks to confirm no new violations.
+
+### Updating or extending rules
+- Edit `.editorconfig` for naming, formatting, and code-style rules.
+- Edit `Directory.Build.props` to add/remove analyzer packages or adjust analysis settings.
+- Use per-directory overrides in `.editorconfig` (for example, to relax rules in a specific folder).
+
+### Unity-specific notes
+- Unity lifecycle methods (e.g., `Awake`, `Start`, `OnEnable`) already match PascalCase rules.
+- Private fields (including `[SerializeField] private`) must be `_camelCase` (example: `_appleFruit`).
+- Constants and readonly fields use `ALL_UPPER` (example: `MAX_SPEED`).
+- If a Unity API pattern conflicts with a rule, prefer a scoped `.editorconfig` override in that folder.
