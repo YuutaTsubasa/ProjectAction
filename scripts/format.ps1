@@ -14,7 +14,8 @@ $replacement = 'Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "$1.Player",
 $updated = [System.Text.RegularExpressions.Regex]::Replace($content, $pattern, $replacement)
 
 if ($updated -ne $content) {
-    Set-Content -LiteralPath $SolutionPath -Value $updated
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($SolutionPath, $updated, $utf8NoBom)
     Write-Host "Updated Player project display names in $SolutionPath"
 }
 

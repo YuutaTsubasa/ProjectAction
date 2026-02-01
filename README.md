@@ -14,7 +14,7 @@ See `docs/AssetPolicy.md` for setup, usage, and editor toggle instructions.
 3. One-shot format workflow (renames duplicate Player display names, restores, then formats):
    - Windows: `powershell -ExecutionPolicy Bypass -File scripts/format.ps1`
    - macOS/Linux: `bash scripts/format.sh`
-3. Run the PrimaryRoot reference check in Unity Test Runner (EditMode).
+4. Run the PrimaryRoot reference check in Unity Test Runner (EditMode).
 
 ### Before opening a PR
 - Run the command above and fix all diagnostics it reports.

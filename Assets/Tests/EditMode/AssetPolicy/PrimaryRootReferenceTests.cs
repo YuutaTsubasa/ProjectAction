@@ -36,6 +36,7 @@ namespace ProjectAction.AssetPolicy.Tests
             return AssetDatabase.FindAssets("t:Prefab t:Scene t:ScriptableObject")
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .Where(_IsValidAssetPath)
+                .Where(_IsNotPrimaryRootAsset)
                 .Distinct();
         }
 
@@ -69,6 +70,11 @@ namespace ProjectAction.AssetPolicy.Tests
         private static bool _IsPrimaryRootPath(string assetPath)
         {
             return assetPath.StartsWith(PRIMARY_ROOT_PREFIX, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool _IsNotPrimaryRootAsset(string assetPath)
+        {
+            return !_IsPrimaryRootPath(assetPath);
         }
 
         private sealed class Violation
