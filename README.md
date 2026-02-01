@@ -11,6 +11,9 @@ See `docs/AssetPolicy.md` for setup, usage, and editor toggle instructions.
 2. Run the checks (built-in .NET SDK command):
    - `dotnet format ProjectAction.sln --verify-no-changes --severity warn --exclude "Library/**" "Assets/Plugins/**" "Assets/TutorialInfo/**"`
    - `--exclude <EXCLUDE>` accepts a space-separated list of relative paths to exclude.
+3. One-shot format workflow (renames duplicate Player display names, restores, then formats):
+   - Windows: `powershell -ExecutionPolicy Bypass -File scripts/format.ps1`
+   - macOS/Linux: `bash scripts/format.sh`
 3. Run the PrimaryRoot reference check in Unity Test Runner (EditMode).
 
 ### Before opening a PR
