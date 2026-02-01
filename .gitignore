@@ -7,6 +7,10 @@
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
 
+# External primary assets (do not commit)
+Assets/ProjectContents/PrimaryRoot/
+Assets/ProjectContents/PrimaryRoot.meta
+
 # Unity auto-generated files
 *.csproj
 *.sln
