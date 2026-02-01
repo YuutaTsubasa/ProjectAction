@@ -11,6 +11,7 @@ See `docs/AssetPolicy.md` for setup, usage, and editor toggle instructions.
 2. Run the checks (built-in .NET SDK command):
    - `dotnet format ProjectAction.sln --verify-no-changes --severity warn --exclude "Library/**" "Assets/Plugins/**" "Assets/TutorialInfo/**"`
    - `--exclude <EXCLUDE>` accepts a space-separated list of relative paths to exclude.
+3. Run the PrimaryRoot reference check in Unity Test Runner (EditMode).
 
 ### Before opening a PR
 - Run the command above and fix all diagnostics it reports.

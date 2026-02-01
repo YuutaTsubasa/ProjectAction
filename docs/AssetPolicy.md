@@ -38,6 +38,18 @@ Use Unity menu:
 
 The setting is stored in `Assets/Resources/GlobalSettings.asset`.
 
+## PrimaryRoot Reference Check (Editor Test)
+An EditMode test enforces the rule that Prefab/Scene/ScriptableObject assets must not
+reference `Assets/ProjectContents/PrimaryRoot` directly.
+
+Run in Unity Test Runner:
+- Category: EditMode
+- Test: `PrimaryRootReferenceTests.NoAssetsReferencePrimaryRoot`
+
+Failure output lists:
+- The violating asset path
+- The referenced PrimaryRoot asset path
+
 ## FAQ
 **Q: What happens if both Primary and Fallback are missing?**  
 A: You get a warning log and `null` is returned.
