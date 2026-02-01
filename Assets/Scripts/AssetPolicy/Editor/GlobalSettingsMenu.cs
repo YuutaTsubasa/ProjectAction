@@ -1,11 +1,12 @@
 using UnityEditor;
+
 using UnityEngine;
 
 namespace ProjectAction.AssetPolicy.Editor
 {
     internal static class GlobalSettingsMenu
     {
-        private const string AssetPath = "Assets/Resources/GlobalSettings.asset";
+        private const string ASSET_PATH = "Assets/Resources/GlobalSettings.asset";
 
         [MenuItem("Project/Asset Policy/Use Full (Primary Preferred)")]
         private static void _UseFull()
@@ -25,21 +26,21 @@ namespace ProjectAction.AssetPolicy.Editor
 
         private static GlobalSettings _GetOrCreateSettings()
         {
-            var settings = AssetDatabase.LoadAssetAtPath<GlobalSettings>(AssetPath);
+            var settings = AssetDatabase.LoadAssetAtPath<GlobalSettings>(ASSET_PATH);
             if (settings != null)
             {
                 return settings;
             }
 
             settings = ScriptableObject.CreateInstance<GlobalSettings>();
-            AssetDatabase.CreateAsset(settings, AssetPath);
+            AssetDatabase.CreateAsset(settings, ASSET_PATH);
             AssetDatabase.SaveAssets();
             return settings;
         }
 
         private static void _SetMode(GlobalSettings settings, AssetAccessMode mode)
         {
-            SerializedObject serializedObject = new SerializedObject(settings);
+            var serializedObject = new SerializedObject(settings);
             serializedObject.FindProperty("_assetAccessMode").enumValueIndex = (int)mode;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(settings);

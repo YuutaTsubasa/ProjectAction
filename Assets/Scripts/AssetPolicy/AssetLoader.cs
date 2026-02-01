@@ -1,13 +1,15 @@
 using System;
+
 using UnityEngine;
+
 using Object = UnityEngine.Object;
 
 namespace ProjectAction.AssetPolicy
 {
     public static class AssetLoader
     {
-        private const string PrimaryPrefix = "Primary/";
-        private const string FallbackPrefix = "Fallback/";
+        private const string PRIMARY_PREFIX = "Primary/";
+        private const string FALLBACK_PREFIX = "Fallback/";
 
         public static T Load<T>(string path) where T : Object
         {
@@ -25,14 +27,14 @@ namespace ProjectAction.AssetPolicy
 
         private static T _LoadPrimaryThenFallback<T>(string path) where T : Object
         {
-            var primaryPath = $"{PrimaryPrefix}{path}";
+            var primaryPath = $"{PRIMARY_PREFIX}{path}";
             var primary = Resources.Load<T>(primaryPath);
             if (primary != null)
             {
                 return primary;
             }
 
-            var fallbackPath = $"{FallbackPrefix}{path}";
+            var fallbackPath = $"{FALLBACK_PREFIX}{path}";
             var fallback = Resources.Load<T>(fallbackPath);
             if (fallback != null)
             {
@@ -45,7 +47,7 @@ namespace ProjectAction.AssetPolicy
 
         private static T _LoadFallbackOnly<T>(string path) where T : Object
         {
-            var fallbackPath = $"{FallbackPrefix}{path}";
+            var fallbackPath = $"{FALLBACK_PREFIX}{path}";
             var fallback = Resources.Load<T>(fallbackPath);
             if (fallback != null)
             {

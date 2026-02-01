@@ -9,7 +9,8 @@ See `docs/AssetPolicy.md` for setup, usage, and editor toggle instructions.
 ### Local setup
 1. Open the project once in Unity to generate the solution and project files.
 2. Run the checks (built-in .NET SDK command):
-   - `dotnet format ProjectAction.sln --verify-no-changes --severity warn`
+   - `dotnet format ProjectAction.sln --verify-no-changes --severity warn --exclude "Library/**" "Assets/Plugins/**" "Assets/TutorialInfo/**"`
+   - `--exclude <EXCLUDE>` accepts a space-separated list of relative paths to exclude.
 
 ### Before opening a PR
 - Run the command above and fix all diagnostics it reports.
