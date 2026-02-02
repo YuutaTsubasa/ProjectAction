@@ -62,5 +62,4 @@ A: Only reference `AssetAdapter` assets or Fallback assets in Prefabs/Scenes.
 
 ## Decision Notes
 The repository enforces `_camelCase` for private fields and `_PascalCase` for private methods via analyzers.
-This conflicts with the "no underscore" preference, but we keep the enforced rules to avoid analyzer errors
-and preserve consistency.
+This matches the `.editorconfig` naming rules and is required to avoid analyzer errors.
