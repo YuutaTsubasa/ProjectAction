@@ -6,6 +6,10 @@ This repository uses `.editorconfig` plus Roslyn analyzers to keep C# style and 
 ## Primary / Fallback Asset Policy
 See `docs/AssetPolicy.md` for setup, usage, and editor toggle instructions.
 
+## Game Design Document (GDD)
+`docs/GDD.md` is the authoritative design reference for gameplay scope, features, and UX targets.
+目前僅實作第一階段（跑酷核心）；第二階段與「未來擴展」內容屬於設計規劃。
+
 ### Local setup
 1. Open the project once in Unity to generate the solution and project files.
 2. Run the checks (built-in .NET SDK command):
