@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
+#if UNITY_EDITOR
 namespace ProjectAction.AssetPolicy.Tests
 {
     public sealed class PrimaryRootReferenceTests
@@ -13,10 +16,10 @@ namespace ProjectAction.AssetPolicy.Tests
         [Test]
         public void NoAssetsReferencePrimaryRoot()
         {
-            var assetPaths = _FindTargetAssets();
+            var assetPaths = FindTargetAssets();
             var violations = assetPaths
-                .Select(_FindViolationsForAsset)
-                .Where(_HasViolations)
+                .Select(FindViolationsForAsset)
+                .Where(HasViolations)
                 .ToList();
 
             if (!violations.Any())
@@ -26,55 +29,55 @@ namespace ProjectAction.AssetPolicy.Tests
 
             var message = string.Join(
                 Environment.NewLine,
-                violations.Select(_FormatViolation));
+                violations.Select(FormatViolation));
 
             Assert.Fail($"PrimaryRoot references found:{Environment.NewLine}{message}");
         }
 
-        private static IEnumerable<string> _FindTargetAssets()
+        private static IEnumerable<string> FindTargetAssets()
         {
             return AssetDatabase.FindAssets("t:Prefab t:Scene t:ScriptableObject")
                 .Select(AssetDatabase.GUIDToAssetPath)
-                .Where(_IsValidAssetPath)
-                .Where(_IsNotPrimaryRootAsset)
+                .Where(IsValidAssetPath)
+                .Where(IsNotPrimaryRootAsset)
                 .Distinct();
         }
 
-        private static Violation _FindViolationsForAsset(string assetPath)
+        private static Violation FindViolationsForAsset(string assetPath)
         {
             var dependencies = AssetDatabase.GetDependencies(assetPath, true);
             var primaryReferences = dependencies
-                .Where(_IsPrimaryRootPath)
+                .Where(IsPrimaryRootPath)
                 .Distinct()
                 .ToArray();
 
             return new Violation(assetPath, primaryReferences);
         }
 
-        private static bool _HasViolations(Violation violation)
+        private static bool HasViolations(Violation violation)
         {
             return violation.PrimaryReferences.Length > 0;
         }
 
-        private static string _FormatViolation(Violation violation)
+        private static string FormatViolation(Violation violation)
         {
             var references = string.Join(", ", violation.PrimaryReferences);
             return $"{violation.AssetPath} -> {references}";
         }
 
-        private static bool _IsValidAssetPath(string assetPath)
+        private static bool IsValidAssetPath(string assetPath)
         {
             return !string.IsNullOrWhiteSpace(assetPath);
         }
 
-        private static bool _IsPrimaryRootPath(string assetPath)
+        private static bool IsPrimaryRootPath(string assetPath)
         {
             return assetPath.StartsWith(PRIMARY_ROOT_PREFIX, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static bool _IsNotPrimaryRootAsset(string assetPath)
+        private static bool IsNotPrimaryRootAsset(string assetPath)
         {
-            return !_IsPrimaryRootPath(assetPath);
+            return !IsPrimaryRootPath(assetPath);
         }
 
         private sealed class Violation
@@ -90,3 +93,4 @@ namespace ProjectAction.AssetPolicy.Tests
         }
     }
 }
+#endif

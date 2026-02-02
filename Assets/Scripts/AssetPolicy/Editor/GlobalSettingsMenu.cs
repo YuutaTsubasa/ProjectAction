@@ -8,22 +8,22 @@ namespace ProjectAction.AssetPolicy.Editor
         private const string ASSET_PATH = "Assets/Resources/GlobalSettings.asset";
 
         [MenuItem("Project/Asset Policy/Use Full (Primary Preferred)")]
-        private static void _UseFull()
+        private static void UseFull()
         {
-            var settings = _GetOrCreateSettings();
+            var settings = GetOrCreateSettings();
             settings.hideFlags = HideFlags.None;
-            _SetMode(settings, AssetAccessMode.Full);
+            SetMode(settings, AssetAccessMode.Full);
         }
 
         [MenuItem("Project/Asset Policy/Use Restricted (Fallback Only)")]
-        private static void _UseRestricted()
+        private static void UseRestricted()
         {
-            var settings = _GetOrCreateSettings();
+            var settings = GetOrCreateSettings();
             settings.hideFlags = HideFlags.None;
-            _SetMode(settings, AssetAccessMode.Restricted);
+            SetMode(settings, AssetAccessMode.Restricted);
         }
 
-        private static GlobalSettings _GetOrCreateSettings()
+        private static GlobalSettings GetOrCreateSettings()
         {
             var settings = AssetDatabase.LoadAssetAtPath<GlobalSettings>(ASSET_PATH);
             if (settings != null)
@@ -37,7 +37,7 @@ namespace ProjectAction.AssetPolicy.Editor
             return settings;
         }
 
-        private static void _SetMode(GlobalSettings settings, AssetAccessMode mode)
+        private static void SetMode(GlobalSettings settings, AssetAccessMode mode)
         {
             var serializedObject = new SerializedObject(settings);
             serializedObject.FindProperty("_assetAccessMode").enumValueIndex = (int)mode;

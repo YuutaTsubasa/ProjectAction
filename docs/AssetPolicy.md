@@ -61,5 +61,5 @@ A: Create a new `AssetAdapter<T>` subclass with `[CreateAssetMenu]`.
 A: Only reference `AssetAdapter` assets or Fallback assets in Prefabs/Scenes.
 
 ## Decision Notes
-The repository enforces `_camelCase` for private fields and `_PascalCase` for private methods via analyzers.
+The repository enforces `_camelCase` for private fields and `PascalCase` for private methods via analyzers.
 This matches the `.editorconfig` naming rules and is required to avoid analyzer errors.

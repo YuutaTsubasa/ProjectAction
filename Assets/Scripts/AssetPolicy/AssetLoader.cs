@@ -13,17 +13,17 @@ namespace ProjectAction.AssetPolicy
         {
             if (string.IsNullOrWhiteSpace(path))
             {
-                _LogMissing(typeof(T), path, GlobalSettings.CurrentMode, Array.Empty<string>());
+                LogMissing(typeof(T), path, GlobalSettings.CurrentMode, Array.Empty<string>());
                 return null;
             }
 
             var normalizedPath = path.TrimStart('/');
             return GlobalSettings.CurrentMode == AssetAccessMode.Restricted
-                ? _LoadFallbackOnly<T>(normalizedPath)
-                : _LoadPrimaryThenFallback<T>(normalizedPath);
+                ? LoadFallbackOnly<T>(normalizedPath)
+                : LoadPrimaryThenFallback<T>(normalizedPath);
         }
 
-        private static T _LoadPrimaryThenFallback<T>(string path) where T : Object
+        private static T LoadPrimaryThenFallback<T>(string path) where T : Object
         {
             var primaryPath = $"{PRIMARY_PREFIX}{path}";
             var primary = Resources.Load<T>(primaryPath);
@@ -39,11 +39,11 @@ namespace ProjectAction.AssetPolicy
                 return fallback;
             }
 
-            _LogMissing(typeof(T), path, AssetAccessMode.Full, new[] { primaryPath, fallbackPath });
+            LogMissing(typeof(T), path, AssetAccessMode.Full, new[] { primaryPath, fallbackPath });
             return null;
         }
 
-        private static T _LoadFallbackOnly<T>(string path) where T : Object
+        private static T LoadFallbackOnly<T>(string path) where T : Object
         {
             var fallbackPath = $"{FALLBACK_PREFIX}{path}";
             var fallback = Resources.Load<T>(fallbackPath);
@@ -52,11 +52,11 @@ namespace ProjectAction.AssetPolicy
                 return fallback;
             }
 
-            _LogMissing(typeof(T), path, AssetAccessMode.Restricted, new[] { fallbackPath });
+            LogMissing(typeof(T), path, AssetAccessMode.Restricted, new[] { fallbackPath });
             return null;
         }
 
-        private static void _LogMissing(Type assetType, string path, AssetAccessMode mode, string[] attempts)
+        private static void LogMissing(Type assetType, string path, AssetAccessMode mode, string[] attempts)
         {
             var attemptText = attempts.Length > 0 ? string.Join(", ", attempts) : "none";
             Debug.LogWarning(
