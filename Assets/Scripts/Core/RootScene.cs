@@ -29,6 +29,10 @@ namespace ProjectAction.Core
             System.Action goalHandler = null;
 
             checkpointService.SetInitial(_spawnPoint != null ? _spawnPoint : _player != null ? _player.transform : null);
+            if (_player != null && _camera != null)
+            {
+                _player.MoveReference = _camera.transform;
+            }
 
             var checkpoints = UnityEngine.Object.FindObjectsByType<ProjectAction.Checkpoint.CheckpointTrigger>(
                 FindObjectsSortMode.None);

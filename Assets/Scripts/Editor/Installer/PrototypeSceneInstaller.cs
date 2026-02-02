@@ -82,9 +82,14 @@ namespace ProjectAction.Editor.Installers
                 checkpoint.name = "Checkpoint";
                 checkpoint.transform.position = new Vector3(0f, 0.5f, 8f);
                 Undo.RegisterCreatedObjectUndo(checkpoint, "Create Checkpoint");
-                var collider = checkpoint.GetComponent<BoxCollider>();
-                collider.isTrigger = true;
-                checkpoint.AddComponent<ProjectAction.Checkpoint.CheckpointTrigger>();
+                var triggerObject = new GameObject("CheckpointTrigger");
+                triggerObject.transform.SetParent(checkpoint.transform, false);
+                triggerObject.transform.localScale = Vector3.one * 1.5f;
+                Undo.RegisterCreatedObjectUndo(triggerObject, "Create CheckpointTrigger");
+
+                var triggerCollider = triggerObject.AddComponent<BoxCollider>();
+                triggerCollider.isTrigger = true;
+                triggerObject.AddComponent<ProjectAction.Checkpoint.CheckpointTrigger>();
             }
 
             var goal = GameObject.Find("Goal");
@@ -94,9 +99,14 @@ namespace ProjectAction.Editor.Installers
                 goal.name = "Goal";
                 goal.transform.position = new Vector3(0f, 0.5f, 18f);
                 Undo.RegisterCreatedObjectUndo(goal, "Create Goal");
-                var collider = goal.GetComponent<BoxCollider>();
-                collider.isTrigger = true;
-                goal.AddComponent<ProjectAction.Checkpoint.GoalTrigger>();
+                var triggerObject = new GameObject("GoalTrigger");
+                triggerObject.transform.SetParent(goal.transform, false);
+                triggerObject.transform.localScale = Vector3.one * 1.5f;
+                Undo.RegisterCreatedObjectUndo(triggerObject, "Create GoalTrigger");
+
+                var triggerCollider = triggerObject.AddComponent<BoxCollider>();
+                triggerCollider.isTrigger = true;
+                triggerObject.AddComponent<ProjectAction.Checkpoint.GoalTrigger>();
             }
 
             var floor = GameObject.Find("PrototypeFloor");

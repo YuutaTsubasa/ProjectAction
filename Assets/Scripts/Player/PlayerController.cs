@@ -57,8 +57,10 @@ namespace ProjectAction.Player
 
             var moveInput = input.Move.Value;
             var reference = _moveReference != null ? _moveReference : transform;
-            var forward = Vector3.Scale(reference.forward, new Vector3(1f, 0f, 1f)).normalized;
-            var right = Vector3.Scale(reference.right, new Vector3(1f, 0f, 1f)).normalized;
+            var forward = reference != transform
+                ? Vector3.Scale(transform.position - reference.position, new Vector3(1f, 0f, 1f)).normalized
+                : Vector3.Scale(reference.forward, new Vector3(1f, 0f, 1f)).normalized;
+            var right = Vector3.Cross(Vector3.up, forward).normalized;
             var moveDirection = (forward * moveInput.y + right * moveInput.x).normalized;
 
             var speed = _moveSpeed * (input.SprintHeld.Value ? _sprintMultiplier : 1f);
