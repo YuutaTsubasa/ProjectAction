@@ -34,8 +34,6 @@ namespace ProjectAction.Input
                 move += gamepad.leftStick.ReadValue();
             }
 
-            move = Vector2.ClampMagnitude(move, 1f);
-
             var look = Vector2.zero;
             if (mouse != null)
             {
@@ -52,6 +50,8 @@ namespace ProjectAction.Input
                 move += _virtualInput.Move;
                 look += _virtualInput.Look;
             }
+
+            move = Vector2.ClampMagnitude(move, 1f);
 
             var jumpPressed =
                 (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) ||

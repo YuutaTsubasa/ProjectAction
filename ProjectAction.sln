@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{fc4e7fcf-e45e-a26b-9ea6-f1a16dabda82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DOTween.Modules", "DOTween.Modules.csproj", "{62e7c78b-08a6-70d3-60af-4e6bc41de67a}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-firstpass", "Assembly-CSharp-firstpass.csproj", "{7b9433f4-a31d-c0b5-6309-9528aaa7c5bb}"
 EndProject
 Global
@@ -16,6 +18,8 @@ Global
 		{d0b27fd3-252d-e679-05b5-c0564ad279d2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{fc4e7fcf-e45e-a26b-9ea6-f1a16dabda82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{fc4e7fcf-e45e-a26b-9ea6-f1a16dabda82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62e7c78b-08a6-70d3-60af-4e6bc41de67a}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62e7c78b-08a6-70d3-60af-4e6bc41de67a}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7b9433f4-a31d-c0b5-6309-9528aaa7c5bb}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7b9433f4-a31d-c0b5-6309-9528aaa7c5bb}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection

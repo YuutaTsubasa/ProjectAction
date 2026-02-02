@@ -32,6 +32,11 @@ namespace ProjectAction.Editor.Installers
                 playerObject.name = "Player";
                 playerObject.transform.position = new Vector3(0f, 1f, 0f);
                 Undo.RegisterCreatedObjectUndo(playerObject, "Create Player");
+                var capsuleCollider = playerObject.GetComponent<CapsuleCollider>();
+                if (capsuleCollider != null)
+                {
+                    Object.DestroyImmediate(capsuleCollider);
+                }
                 var controller = playerObject.AddComponent<CharacterController>();
                 player = playerObject.AddComponent<ProjectAction.Player.PlayerController>();
 
