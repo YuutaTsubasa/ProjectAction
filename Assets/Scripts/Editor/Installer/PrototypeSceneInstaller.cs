@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -54,15 +55,57 @@ namespace ProjectAction.Editor.Installers
                 cameraObject.tag = "MainCamera";
             }
 
-            var thirdPerson = cameraComponent.GetComponent<ProjectAction.Camera.ThirdPersonCamera>();
-            if (thirdPerson == null)
+            var brain = cameraComponent.GetComponent<CinemachineBrain>();
+            if (brain == null)
             {
-                thirdPerson = cameraComponent.gameObject.AddComponent<ProjectAction.Camera.ThirdPersonCamera>();
+                brain = cameraComponent.gameObject.AddComponent<CinemachineBrain>();
             }
 
-            var serializedCamera = new SerializedObject(thirdPerson);
-            serializedCamera.FindProperty("_target").objectReferenceValue = player.transform;
-            serializedCamera.ApplyModifiedPropertiesWithoutUndo();
+            var legacyThirdPerson = cameraComponent.GetComponent<ProjectAction.Camera.ThirdPersonCamera>();
+            if (legacyThirdPerson != null)
+            {
+                Object.DestroyImmediate(legacyThirdPerson);
+            }
+
+            var virtualCamera = Object.FindFirstObjectByType<CinemachineCamera>();
+            if (virtualCamera == null)
+            {
+                var cameraRigObject = new GameObject("CinemachineCamera");
+                Undo.RegisterCreatedObjectUndo(cameraRigObject, "Create Cinemachine Camera");
+                virtualCamera = cameraRigObject.AddComponent<CinemachineCamera>();
+            }
+
+            var orbitalFollow = virtualCamera.GetComponent<CinemachineOrbitalFollow>();
+            if (orbitalFollow == null)
+            {
+                orbitalFollow = virtualCamera.gameObject.AddComponent<CinemachineOrbitalFollow>();
+            }
+
+            var rotationComposer = virtualCamera.GetComponent<CinemachineRotationComposer>();
+            if (rotationComposer == null)
+            {
+                rotationComposer = virtualCamera.gameObject.AddComponent<CinemachineRotationComposer>();
+            }
+
+            var orbitalCamera = virtualCamera.GetComponent<ProjectAction.Camera.CinemachineOrbitalCamera>();
+            if (orbitalCamera == null)
+            {
+                orbitalCamera = virtualCamera.gameObject.AddComponent<ProjectAction.Camera.CinemachineOrbitalCamera>();
+            }
+
+            var serializedVirtualCamera = new SerializedObject(virtualCamera);
+            var targetProperty = serializedVirtualCamera.FindProperty("Target");
+            targetProperty.FindPropertyRelative("TrackingTarget").objectReferenceValue = player.transform;
+            targetProperty.FindPropertyRelative("LookAtTarget").objectReferenceValue = player.transform;
+            targetProperty.FindPropertyRelative("CustomLookAtTarget").boolValue = true;
+            serializedVirtualCamera.ApplyModifiedPropertiesWithoutUndo();
+
+            var serializedOrbitalCamera = new SerializedObject(orbitalCamera);
+            serializedOrbitalCamera.FindProperty("_virtualCamera").objectReferenceValue = virtualCamera;
+            serializedOrbitalCamera.FindProperty("_orbitalFollow").objectReferenceValue = orbitalFollow;
+            serializedOrbitalCamera.FindProperty("_rotationComposer").objectReferenceValue = rotationComposer;
+            serializedOrbitalCamera.FindProperty("_target").objectReferenceValue = player.transform;
+            serializedOrbitalCamera.ApplyModifiedPropertiesWithoutUndo();
 
             var spawnPoint = GameObject.Find("SpawnPoint");
             if (spawnPoint == null)
@@ -125,7 +168,7 @@ namespace ProjectAction.Editor.Installers
 
             var serializedRoot = new SerializedObject(root);
             serializedRoot.FindProperty("_player").objectReferenceValue = player;
-            serializedRoot.FindProperty("_camera").objectReferenceValue = thirdPerson;
+            serializedRoot.FindProperty("_camera").objectReferenceValue = orbitalCamera;
             serializedRoot.FindProperty("_virtualInput").objectReferenceValue =
                 virtualInputObject.GetComponent<ProjectAction.Input.VirtualInputBridge>();
             serializedRoot.FindProperty("_spawnPoint").objectReferenceValue = spawnPoint.transform;

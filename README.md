@@ -36,3 +36,9 @@ See `docs/AssetPolicy.md` for setup, usage, and editor toggle instructions.
 - Private methods use PascalCase without a leading underscore (example: `CalculateSpeed`).
 - Constants and `static readonly` fields use `ALL_UPPER` (example: `MAX_SPEED`).
 - If a Unity API pattern conflicts with a rule, prefer a scoped `.editorconfig` override in that folder.
+
+## Camera Setup (Cinemachine Orbital)
+- The installer creates a Cinemachine setup (Main Camera + CinemachineBrain + CinemachineCamera with Orbital Follow).
+- The virtual camera is driven by `CinemachineOrbitalCamera` to map the existing look input to Cinemachine axes.
+- A Rotation Composer is added to keep the camera aimed at the player.
+- If you need to re-create the scene, run `Tools > Prototype > Install Parkour Vertical Slice v0` again.
