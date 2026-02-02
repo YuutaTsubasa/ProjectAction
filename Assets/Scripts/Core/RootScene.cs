@@ -7,7 +7,7 @@ namespace ProjectAction.Core
     {
         [Header("References")]
         [SerializeField] private ProjectAction.Player.PlayerController _player;
-        [SerializeField] private ProjectAction.Camera.ThirdPersonCamera _camera;
+        [SerializeField] private ProjectAction.Camera.CinemachineOrbitalCamera _camera;
         [SerializeField] private ProjectAction.Input.VirtualInputBridge _virtualInput;
         [SerializeField] private Transform _spawnPoint;
 
