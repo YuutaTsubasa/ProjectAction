@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace ProjectAction.Editor.Installers
@@ -148,11 +147,15 @@ namespace ProjectAction.Editor.Installers
                 checkpoint.name = "Checkpoint";
                 Undo.RegisterCreatedObjectUndo(checkpoint, "Create Checkpoint");
             }
-            SetTransform(checkpoint.transform, new Vector3(0f, 3.5f, 27f), Quaternion.identity, Vector3.one, "Update Checkpoint");
+            SetTransform(
+                checkpoint.transform,
+                new Vector3(0f, 3.5f, 27f),
+                Quaternion.identity,
+                new Vector3(3.5f, 2.5f, 3.5f),
+                "Update Checkpoint");
             ConfigureTriggerMarker(
                 checkpoint,
                 "Checkpoint",
-                new Vector3(3.5f, 2.5f, 3.5f),
                 new Color(1f, 0.95f, 0.2f, 0.35f),
                 typeof(ProjectAction.Checkpoint.CheckpointTrigger));
 
@@ -163,11 +166,15 @@ namespace ProjectAction.Editor.Installers
                 goal.name = "Goal";
                 Undo.RegisterCreatedObjectUndo(goal, "Create Goal");
             }
-            SetTransform(goal.transform, new Vector3(24f, 2.5f, 34f), Quaternion.identity, Vector3.one, "Update Goal");
+            SetTransform(
+                goal.transform,
+                new Vector3(24f, 2.5f, 34f),
+                Quaternion.identity,
+                new Vector3(4.5f, 2.5f, 4.5f),
+                "Update Goal");
             ConfigureTriggerMarker(
                 goal,
                 "Goal",
-                new Vector3(4.5f, 2.5f, 4.5f),
                 new Color(1f, 0.95f, 0.2f, 0.35f),
                 typeof(ProjectAction.Checkpoint.GoalTrigger));
 
@@ -236,7 +243,6 @@ namespace ProjectAction.Editor.Installers
         private static void ConfigureTriggerMarker(
             GameObject marker,
             string markerName,
-            Vector3 scale,
             Color inactiveColor,
             System.Type triggerType)
         {
@@ -251,8 +257,6 @@ namespace ProjectAction.Editor.Installers
                 Undo.DestroyObjectImmediate(legacyTrigger.gameObject);
             }
 
-            marker.transform.localScale = scale;
-
             var collider = marker.GetComponent<Collider>();
             if (collider != null)
             {
@@ -260,10 +264,14 @@ namespace ProjectAction.Editor.Installers
                 collider.isTrigger = true;
             }
 
-            var trigger = marker.GetComponent(triggerType) ?? marker.AddComponent(triggerType);
-            if (trigger != null)
+            var trigger = marker.GetComponent(triggerType);
+            if (trigger == null)
             {
-                Undo.RegisterCreatedObjectUndo(trigger, $"Add {triggerType.Name}");
+                trigger = marker.AddComponent(triggerType);
+                if (trigger != null)
+                {
+                    Undo.RegisterCreatedObjectUndo(trigger, $"Add {triggerType.Name}");
+                }
             }
 
             var visual = marker.GetComponent<ProjectAction.Checkpoint.TriggerVisual>();
@@ -310,26 +318,14 @@ namespace ProjectAction.Editor.Installers
             var material = renderer.sharedMaterial;
             if (material == null || material.shader != shader)
             {
+                // Intentionally replace mismatched materials so the installer can enforce
+                // a predictable transparent setup without mutating arbitrary shared assets.
                 material = new Material(shader);
                 renderer.sharedMaterial = material;
             }
 
-            ConfigureTransparentMaterial(material);
+            ProjectAction.Checkpoint.TriggerMaterialUtility.ConfigureTransparentMaterial(material);
             material.SetColor("_BaseColor", baseColor);
-        }
-
-        private static void ConfigureTransparentMaterial(Material material)
-        {
-            material.SetFloat("_Surface", 1f);
-            material.SetFloat("_Blend", 0f);
-            material.SetFloat("_AlphaClip", 0f);
-            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-            material.SetInt("_ZWrite", 0);
-            material.DisableKeyword("_ALPHATEST_ON");
-            material.EnableKeyword("_ALPHABLEND_ON");
-            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            material.renderQueue = (int)RenderQueue.Transparent;
         }
 
         private static void SetTransform(

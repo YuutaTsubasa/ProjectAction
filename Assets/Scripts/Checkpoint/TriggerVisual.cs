@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace ProjectAction.Checkpoint
 {
@@ -11,6 +10,10 @@ namespace ProjectAction.Checkpoint
         [SerializeField] private Color _inactiveColor = new Color(1f, 0.95f, 0.2f, 0.35f);
         [SerializeField] private Color _activeColor = new Color(0.1f, 1f, 0.2f, 0.6f);
 
+        private Material _cachedMaterial;
+        private bool _ownsCachedMaterial;
+        private MaterialPropertyBlock _propertyBlock;
+
         public void SetInactive()
         {
             ApplyColor(_inactiveColor);
@@ -19,6 +22,11 @@ namespace ProjectAction.Checkpoint
         public void SetActive()
         {
             ApplyColor(_activeColor);
+        }
+
+        private void OnDestroy()
+        {
+            ReleaseCachedMaterial();
         }
 
         private void EnsureRenderer()
@@ -39,48 +47,72 @@ namespace ProjectAction.Checkpoint
                 return;
             }
 
-            var material = EnsureMaterial(_renderer);
-            if (material == null)
+            if (!EnsureMaterial())
             {
                 return;
             }
 
-            material.SetColor(BASE_COLOR_ID, color);
+            _propertyBlock ??= new MaterialPropertyBlock();
+            _renderer.GetPropertyBlock(_propertyBlock);
+            _propertyBlock.SetColor(BASE_COLOR_ID, color);
+            _renderer.SetPropertyBlock(_propertyBlock);
         }
 
-        private static Material EnsureMaterial(Renderer renderer)
+        private bool EnsureMaterial()
         {
             var shader = Shader.Find("Universal Render Pipeline/Unlit")
                 ?? Shader.Find("Universal Render Pipeline/Lit")
                 ?? Shader.Find("Standard");
             if (shader == null)
             {
-                return null;
+                return false;
             }
 
-            var material = renderer.material;
+            var material = _renderer.sharedMaterial;
             if (material == null || material.shader != shader)
             {
-                material = new Material(shader);
-                renderer.material = material;
+                if (_cachedMaterial == null || _cachedMaterial.shader != shader)
+                {
+                    ReleaseCachedMaterial();
+                    _cachedMaterial = new Material(shader);
+                    _ownsCachedMaterial = true;
+                }
+
+                material = _cachedMaterial;
+                _renderer.sharedMaterial = material;
+            }
+            else if (_cachedMaterial != material)
+            {
+                ReleaseCachedMaterial();
+                _cachedMaterial = material;
+                _ownsCachedMaterial = false;
             }
 
-            ConfigureTransparentMaterial(material);
-            return material;
+            TriggerMaterialUtility.ConfigureTransparentMaterial(material);
+            return true;
         }
 
-        private static void ConfigureTransparentMaterial(Material material)
+        private void ReleaseCachedMaterial()
         {
-            material.SetFloat("_Surface", 1f);
-            material.SetFloat("_Blend", 0f);
-            material.SetFloat("_AlphaClip", 0f);
-            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-            material.SetInt("_ZWrite", 0);
-            material.DisableKeyword("_ALPHATEST_ON");
-            material.EnableKeyword("_ALPHABLEND_ON");
-            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            material.renderQueue = (int)RenderQueue.Transparent;
+            if (!_ownsCachedMaterial || _cachedMaterial == null)
+            {
+                _cachedMaterial = null;
+                _ownsCachedMaterial = false;
+                return;
+            }
+
+            if (Application.isPlaying)
+            {
+                Destroy(_cachedMaterial);
+            }
+            else
+            {
+                DestroyImmediate(_cachedMaterial);
+            }
+
+            _cachedMaterial = null;
+            _ownsCachedMaterial = false;
         }
+
     }
 }
