@@ -130,7 +130,7 @@ namespace ProjectAction.Editor.Installers
                 spawnPoint = new GameObject("SpawnPoint");
                 Undo.RegisterCreatedObjectUndo(spawnPoint, "Create SpawnPoint");
             }
-            SetTransform(spawnPoint.transform, new Vector3(0f, 1.5f, -4f), Quaternion.identity, Vector3.one, "Update SpawnPoint");
+            SetTransform(spawnPoint.transform, new Vector3(0f, 2f, -4f), Quaternion.identity, Vector3.one, "Update SpawnPoint");
 
             var virtualInputObject = GameObject.Find("VirtualInputBridge");
             if (virtualInputObject == null)
@@ -149,7 +149,7 @@ namespace ProjectAction.Editor.Installers
             }
             SetTransform(
                 checkpoint.transform,
-                new Vector3(0f, 3.5f, 27f),
+                new Vector3(0f, 5.5f, 27f),
                 Quaternion.identity,
                 new Vector3(3.5f, 2.5f, 3.5f),
                 "Update Checkpoint");
@@ -168,7 +168,7 @@ namespace ProjectAction.Editor.Installers
             }
             SetTransform(
                 goal.transform,
-                new Vector3(24f, 2.5f, 34f),
+                new Vector3(24f, 4.5f, 34f),
                 Quaternion.identity,
                 new Vector3(4.5f, 2.5f, 4.5f),
                 "Update Goal");
@@ -179,17 +179,14 @@ namespace ProjectAction.Editor.Installers
                 typeof(ProjectAction.Checkpoint.GoalTrigger));
 
             var floor = GameObject.Find("PrototypeFloor");
-            if (floor == null)
+            if (floor != null)
             {
-                floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
-                floor.name = "PrototypeFloor";
-                Undo.RegisterCreatedObjectUndo(floor, "Create PrototypeFloor");
+                Undo.DestroyObjectImmediate(floor);
             }
-            SetTransform(floor.transform, new Vector3(12f, -12f, 18f), Quaternion.identity, Vector3.one * 6f, "Update PrototypeFloor");
 
             if (player != null)
             {
-                SetTransform(player.transform, new Vector3(0f, 1.5f, -4f), Quaternion.identity, Vector3.one, "Update Player");
+                SetTransform(player.transform, new Vector3(0f, 2f, -4f), Quaternion.identity, Vector3.one, "Update Player");
             }
 
             var serializedRoot = new SerializedObject(root);
