@@ -1,8 +1,9 @@
+using ProjectAction.Core;
 using UnityEngine;
 
 namespace ProjectAction.Camera
 {
-    public sealed class ThirdPersonCamera : MonoBehaviour
+    public sealed class ThirdPersonCamera : ProjectBehaviour
     {
         [Header("References")]
         [SerializeField] private Transform _target;

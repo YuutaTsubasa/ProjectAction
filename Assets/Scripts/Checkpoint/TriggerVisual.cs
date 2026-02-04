@@ -1,12 +1,14 @@
+using ProjectAction.AutoAttributes;
+using ProjectAction.Core;
 using UnityEngine;
 
 namespace ProjectAction.Checkpoint
 {
-    public sealed class TriggerVisual : MonoBehaviour
+    public sealed class TriggerVisual : ProjectBehaviour
     {
         private static readonly int BASE_COLOR_ID = Shader.PropertyToID("_BaseColor");
 
-        [SerializeField] private Renderer _renderer;
+        [SerializeField, GetComponent] private Renderer _renderer;
         [SerializeField] private Color _inactiveColor = new Color(1f, 0.95f, 0.2f, 0.35f);
         [SerializeField] private Color _activeColor = new Color(0.1f, 1f, 0.2f, 0.6f);
 
@@ -29,25 +31,14 @@ namespace ProjectAction.Checkpoint
             ReleaseCachedMaterial();
         }
 
-        private void EnsureRenderer()
-        {
-            if (_renderer != null)
-            {
-                return;
-            }
-
-            _renderer = GetComponent<Renderer>();
-        }
-
         private void ApplyColor(Color color)
         {
-            EnsureRenderer();
             if (_renderer == null)
             {
                 return;
             }
 
-            if (!EnsureMaterial())
+            if (!TryPrepareMaterial())
             {
                 return;
             }
@@ -58,7 +49,7 @@ namespace ProjectAction.Checkpoint
             _renderer.SetPropertyBlock(_propertyBlock);
         }
 
-        private bool EnsureMaterial()
+        private bool TryPrepareMaterial()
         {
             var shader = Shader.Find("Universal Render Pipeline/Unlit")
                 ?? Shader.Find("Universal Render Pipeline/Lit")

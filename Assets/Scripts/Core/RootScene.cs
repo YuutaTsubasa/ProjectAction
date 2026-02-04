@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 
 namespace ProjectAction.Core
 {
-    public sealed class RootScene : MonoBehaviour
+    public sealed class RootScene : ProjectBehaviour
     {
         [Header("References")]
         [SerializeField] private ProjectAction.Player.PlayerController _player;

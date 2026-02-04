@@ -1,10 +1,11 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using ProjectAction.Core;
 
 namespace ProjectAction.Camera
 {
     [DisallowMultipleComponent]
-    public sealed class CinemachineOrbitalCamera : MonoBehaviour
+    public sealed class CinemachineOrbitalCamera : ProjectBehaviour
     {
         [Header("References")]
         [SerializeField] private CinemachineCamera _virtualCamera;

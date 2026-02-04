@@ -14,6 +14,9 @@ See `docs/AssetPolicy.md` for setup, usage, and editor toggle instructions.
 使用 `docs/PrototypeVerticalSlice.md` 進行安裝與測試說明。
 目前僅提供 Prototype 方塊關卡流程，透過 `RootScene` 的 UniTask `Run()` 驅動完整跑酷閉環。
 
+## Auto Attributes
+`docs/AutoAttributes.md` 說明了 Auto Attributes 的使用方式（lazy resolve 與 editor 預先綁定）。
+
 ### Local setup
 1. Open the project once in Unity to generate the solution and project files.
 2. One-shot format workflow (renames duplicate Player display names, restores, then formats):

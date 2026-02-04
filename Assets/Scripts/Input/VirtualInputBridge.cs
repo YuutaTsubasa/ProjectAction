@@ -1,8 +1,9 @@
+using ProjectAction.Core;
 using UnityEngine;
 
 namespace ProjectAction.Input
 {
-    public sealed class VirtualInputBridge : MonoBehaviour
+    public sealed class VirtualInputBridge : ProjectBehaviour
     {
         [Header("Virtual Input State")]
         [SerializeField] private Vector2 _move;

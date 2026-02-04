@@ -1,9 +1,10 @@
+using ProjectAction.Core;
 using UnityEngine;
 
 namespace ProjectAction.Player
 {
     [RequireComponent(typeof(CharacterController))]
-    public sealed class PlayerController : MonoBehaviour
+    public sealed class PlayerController : ProjectBehaviour
     {
         [Header("References")]
         [SerializeField] private CharacterController _controller;
