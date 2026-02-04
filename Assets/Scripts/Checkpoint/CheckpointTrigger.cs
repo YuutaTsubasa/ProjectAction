@@ -7,11 +7,20 @@ namespace ProjectAction.Checkpoint
     public sealed class CheckpointTrigger : MonoBehaviour
     {
         [SerializeField] private Transform _respawnPoint;
+        [SerializeField] private TriggerVisual _visual;
 
         public event Action<CheckpointTrigger> Triggered;
 
         public Vector3 RespawnPosition => _respawnPoint != null ? _respawnPoint.position : transform.position;
         public Quaternion RespawnRotation => _respawnPoint != null ? _respawnPoint.rotation : transform.rotation;
+
+        private void EnsureVisual()
+        {
+            if (_visual == null)
+            {
+                _visual = GetComponent<TriggerVisual>();
+            }
+        }
 
         private void OnTriggerEnter(Collider other)
         {
@@ -20,6 +29,9 @@ namespace ProjectAction.Checkpoint
             {
                 return;
             }
+
+            EnsureVisual();
+            _visual?.SetActive();
 
             Triggered?.Invoke(this);
         }

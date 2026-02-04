@@ -2,13 +2,27 @@ using Unity.Cinemachine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace ProjectAction.Editor.Installers
 {
     public static class PrototypeSceneInstaller
     {
+        private readonly struct PlatformDefinition
+        {
+            public PlatformDefinition(string name, Vector3 position, Vector3 scale)
+            {
+                Name = name;
+                Position = position;
+                Scale = scale;
+            }
+
+            public string Name { get; }
+            public Vector3 Position { get; }
+            public Vector3 Scale { get; }
+        }
+
         [MenuItem("Tools/Prototype/Install Parkour Vertical Slice v0")]
         public static void Install()
         {
@@ -32,7 +46,6 @@ namespace ProjectAction.Editor.Installers
             {
                 var playerObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
                 playerObject.name = "Player";
-                playerObject.transform.position = new Vector3(0f, 1f, 0f);
                 Undo.RegisterCreatedObjectUndo(playerObject, "Create Player");
                 var capsuleCollider = playerObject.GetComponent<CapsuleCollider>();
                 if (capsuleCollider != null)
@@ -46,6 +59,9 @@ namespace ProjectAction.Editor.Installers
                 serializedPlayer.FindProperty("_controller").objectReferenceValue = controller;
                 serializedPlayer.ApplyModifiedPropertiesWithoutUndo();
             }
+
+            var courseRoot = EnsureCourseRoot();
+            BuildCourse(courseRoot.transform);
 
             var cameraComponent = UnityEngine.Camera.main;
             if (cameraComponent == null)
@@ -112,9 +128,9 @@ namespace ProjectAction.Editor.Installers
             if (spawnPoint == null)
             {
                 spawnPoint = new GameObject("SpawnPoint");
-                spawnPoint.transform.position = player.transform.position;
                 Undo.RegisterCreatedObjectUndo(spawnPoint, "Create SpawnPoint");
             }
+            SetTransform(spawnPoint.transform, new Vector3(0f, 1.5f, -4f), Quaternion.identity, Vector3.one, "Update SpawnPoint");
 
             var virtualInputObject = GameObject.Find("VirtualInputBridge");
             if (virtualInputObject == null)
@@ -127,44 +143,53 @@ namespace ProjectAction.Editor.Installers
             var checkpoint = GameObject.Find("Checkpoint");
             if (checkpoint == null)
             {
-                checkpoint = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                checkpoint = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                 checkpoint.name = "Checkpoint";
-                checkpoint.transform.position = new Vector3(0f, 0.5f, 8f);
                 Undo.RegisterCreatedObjectUndo(checkpoint, "Create Checkpoint");
-                var triggerObject = new GameObject("CheckpointTrigger");
-                triggerObject.transform.SetParent(checkpoint.transform, false);
-                triggerObject.transform.localScale = Vector3.one * 1.5f;
-                Undo.RegisterCreatedObjectUndo(triggerObject, "Create CheckpointTrigger");
-
-                var triggerCollider = triggerObject.AddComponent<BoxCollider>();
-                triggerCollider.isTrigger = true;
-                triggerObject.AddComponent<ProjectAction.Checkpoint.CheckpointTrigger>();
             }
+            SetTransform(
+                checkpoint.transform,
+                new Vector3(0f, 3.5f, 27f),
+                Quaternion.identity,
+                new Vector3(3.5f, 2.5f, 3.5f),
+                "Update Checkpoint");
+            ConfigureTriggerMarker(
+                checkpoint,
+                "Checkpoint",
+                new Color(1f, 0.95f, 0.2f, 0.35f),
+                typeof(ProjectAction.Checkpoint.CheckpointTrigger));
 
             var goal = GameObject.Find("Goal");
             if (goal == null)
             {
-                goal = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                goal = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                 goal.name = "Goal";
-                goal.transform.position = new Vector3(0f, 0.5f, 18f);
                 Undo.RegisterCreatedObjectUndo(goal, "Create Goal");
-                var triggerObject = new GameObject("GoalTrigger");
-                triggerObject.transform.SetParent(goal.transform, false);
-                triggerObject.transform.localScale = Vector3.one * 1.5f;
-                Undo.RegisterCreatedObjectUndo(triggerObject, "Create GoalTrigger");
-
-                var triggerCollider = triggerObject.AddComponent<BoxCollider>();
-                triggerCollider.isTrigger = true;
-                triggerObject.AddComponent<ProjectAction.Checkpoint.GoalTrigger>();
             }
+            SetTransform(
+                goal.transform,
+                new Vector3(24f, 2.5f, 34f),
+                Quaternion.identity,
+                new Vector3(4.5f, 2.5f, 4.5f),
+                "Update Goal");
+            ConfigureTriggerMarker(
+                goal,
+                "Goal",
+                new Color(1f, 0.95f, 0.2f, 0.35f),
+                typeof(ProjectAction.Checkpoint.GoalTrigger));
 
             var floor = GameObject.Find("PrototypeFloor");
             if (floor == null)
             {
                 floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
                 floor.name = "PrototypeFloor";
-                floor.transform.position = Vector3.zero;
                 Undo.RegisterCreatedObjectUndo(floor, "Create PrototypeFloor");
+            }
+            SetTransform(floor.transform, new Vector3(12f, -12f, 18f), Quaternion.identity, Vector3.one * 6f, "Update PrototypeFloor");
+
+            if (player != null)
+            {
+                SetTransform(player.transform, new Vector3(0f, 1.5f, -4f), Quaternion.identity, Vector3.one, "Update Player");
             }
 
             var serializedRoot = new SerializedObject(root);
@@ -180,6 +205,140 @@ namespace ProjectAction.Editor.Installers
 
             EditorSceneManager.MarkSceneDirty(scene);
             Debug.Log("Installed Phase 1 parkour vertical slice objects into the active scene.");
+        }
+
+        private static GameObject EnsureCourseRoot()
+        {
+            var courseRoot = GameObject.Find("PrototypeCourse");
+            if (courseRoot == null)
+            {
+                courseRoot = new GameObject("PrototypeCourse");
+                Undo.RegisterCreatedObjectUndo(courseRoot, "Create PrototypeCourse");
+            }
+
+            return courseRoot;
+        }
+
+        private static void BuildCourse(Transform courseRoot)
+        {
+            var platforms = new[]
+            {
+                new PlatformDefinition("StartPlatform", new Vector3(0f, 0.5f, 0f), new Vector3(8f, 1f, 12f)),
+                new PlatformDefinition("Step01", new Vector3(0f, 1.5f, 10f), new Vector3(4f, 1f, 4f)),
+                new PlatformDefinition("Step02", new Vector3(3f, 2.5f, 16f), new Vector3(4f, 1f, 4f)),
+                new PlatformDefinition("Step03", new Vector3(-3f, 3.5f, 22f), new Vector3(4f, 1f, 4f)),
+                new PlatformDefinition("Runway", new Vector3(0f, 2.5f, 30f), new Vector3(6f, 1f, 10f)),
+                new PlatformDefinition("TurnPlatform", new Vector3(8f, 2.5f, 34f), new Vector3(6f, 1f, 6f)),
+                new PlatformDefinition("Sprint01", new Vector3(16f, 1.5f, 34f), new Vector3(6f, 1f, 10f)),
+                new PlatformDefinition("GoalPlatform", new Vector3(24f, 1.5f, 34f), new Vector3(8f, 1f, 8f)),
+            };
+
+            foreach (var platform in platforms)
+            {
+                var platformObject = EnsurePlatform(courseRoot, platform.Name);
+                SetTransform(platformObject.transform, platform.Position, Quaternion.identity, platform.Scale, $"Update {platform.Name}");
+            }
+        }
+
+        private static void ConfigureTriggerMarker(
+            GameObject marker,
+            string markerName,
+            Color inactiveColor,
+            System.Type triggerType)
+        {
+            if (marker == null)
+            {
+                return;
+            }
+
+            var legacyTrigger = marker.transform.Find($"{markerName}Trigger");
+            if (legacyTrigger != null)
+            {
+                Undo.DestroyObjectImmediate(legacyTrigger.gameObject);
+            }
+
+            var collider = marker.GetComponent<Collider>();
+            if (collider != null)
+            {
+                Undo.RecordObject(collider, $"Update {markerName} Collider");
+                collider.isTrigger = true;
+            }
+
+            var trigger = marker.GetComponent(triggerType);
+            if (trigger == null)
+            {
+                trigger = marker.AddComponent(triggerType);
+                if (trigger != null)
+                {
+                    Undo.RegisterCreatedObjectUndo(trigger, $"Add {triggerType.Name}");
+                }
+            }
+
+            var visual = marker.GetComponent<ProjectAction.Checkpoint.TriggerVisual>();
+            if (visual == null)
+            {
+                visual = marker.AddComponent<ProjectAction.Checkpoint.TriggerVisual>();
+                Undo.RegisterCreatedObjectUndo(visual, $"Add {markerName} Visual");
+            }
+            visual.SetInactive();
+
+            var renderer = marker.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                ApplyTransparentMaterial(renderer, inactiveColor, $"Update {markerName} Material");
+            }
+        }
+
+        private static GameObject EnsurePlatform(Transform parent, string name)
+        {
+            var existing = parent.Find(name);
+            if (existing != null)
+            {
+                return existing.gameObject;
+            }
+
+            var platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            platform.name = name;
+            platform.transform.SetParent(parent, false);
+            Undo.RegisterCreatedObjectUndo(platform, $"Create {name}");
+            return platform;
+        }
+
+        private static void ApplyTransparentMaterial(Renderer renderer, Color baseColor, string undoName)
+        {
+            var shader = Shader.Find("Universal Render Pipeline/Unlit")
+                ?? Shader.Find("Universal Render Pipeline/Lit")
+                ?? Shader.Find("Standard");
+            if (shader == null)
+            {
+                return;
+            }
+
+            Undo.RecordObject(renderer, undoName);
+            var material = renderer.sharedMaterial;
+            if (material == null || material.shader != shader)
+            {
+                // Intentionally replace mismatched materials so the installer can enforce
+                // a predictable transparent setup without mutating arbitrary shared assets.
+                material = new Material(shader);
+                renderer.sharedMaterial = material;
+            }
+
+            ProjectAction.Checkpoint.TriggerMaterialUtility.ConfigureTransparentMaterial(material);
+            material.SetColor("_BaseColor", baseColor);
+        }
+
+        private static void SetTransform(
+            Transform target,
+            Vector3 position,
+            Quaternion rotation,
+            Vector3 scale,
+            string undoName)
+        {
+            Undo.RecordObject(target, undoName);
+            target.position = position;
+            target.rotation = rotation;
+            target.localScale = scale;
         }
     }
 }

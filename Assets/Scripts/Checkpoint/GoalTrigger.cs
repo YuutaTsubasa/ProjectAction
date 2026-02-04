@@ -6,7 +6,17 @@ namespace ProjectAction.Checkpoint
     [RequireComponent(typeof(Collider))]
     public sealed class GoalTrigger : MonoBehaviour
     {
+        [SerializeField] private TriggerVisual _visual;
+
         public event Action Triggered;
+
+        private void EnsureVisual()
+        {
+            if (_visual == null)
+            {
+                _visual = GetComponent<TriggerVisual>();
+            }
+        }
 
         private void OnTriggerEnter(Collider other)
         {
@@ -15,6 +25,9 @@ namespace ProjectAction.Checkpoint
             {
                 return;
             }
+
+            EnsureVisual();
+            _visual?.SetActive();
 
             Triggered?.Invoke();
         }
