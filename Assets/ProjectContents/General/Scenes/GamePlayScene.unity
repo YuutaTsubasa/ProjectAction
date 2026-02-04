@@ -751,6 +751,7 @@ MonoBehaviour:
   _player: {fileID: 938414875}
   _camera: {fileID: 1211270352}
   _virtualInput: {fileID: 173910939}
+  _inputActions: {fileID: 11400000, guid: 052faaac586de48259a63d0c4782560b, type: 2}
   _spawnPoint: {fileID: 1069108242}
   _killY: -10
 --- !u!4 &1342799623

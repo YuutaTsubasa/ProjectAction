@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 namespace ProjectAction.Editor.Installers
 {
@@ -171,6 +172,9 @@ namespace ProjectAction.Editor.Installers
             serializedRoot.FindProperty("_camera").objectReferenceValue = orbitalCamera;
             serializedRoot.FindProperty("_virtualInput").objectReferenceValue =
                 virtualInputObject.GetComponent<ProjectAction.Input.VirtualInputBridge>();
+            var inputActions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(
+                "Assets/InputSystem_Actions.inputactions");
+            serializedRoot.FindProperty("_inputActions").objectReferenceValue = inputActions;
             serializedRoot.FindProperty("_spawnPoint").objectReferenceValue = spawnPoint.transform;
             serializedRoot.ApplyModifiedPropertiesWithoutUndo();
 

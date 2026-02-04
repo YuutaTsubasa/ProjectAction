@@ -7,43 +7,35 @@ namespace ProjectAction.Input
     {
         private readonly InputState _state = new();
         private readonly VirtualInputBridge _virtualInput;
+        private readonly InputActionAsset _actions;
+        private readonly InputAction _moveAction;
+        private readonly InputAction _lookAction;
+        private readonly InputAction _jumpAction;
+        private readonly InputAction _sprintAction;
 
-        public InputService(VirtualInputBridge virtualInput)
+        public InputService(InputActionAsset inputActions, VirtualInputBridge virtualInput)
         {
             _virtualInput = virtualInput;
+            if (inputActions == null)
+            {
+                Debug.LogError("Input actions asset is missing. Input will be disabled.");
+                return;
+            }
+
+            _actions = Object.Instantiate(inputActions);
+            _moveAction = _actions.FindAction("Player/Move", true);
+            _lookAction = _actions.FindAction("Player/Look", true);
+            _jumpAction = _actions.FindAction("Player/Jump", true);
+            _sprintAction = _actions.FindAction("Player/Sprint", true);
+            _actions.Enable();
         }
 
         public InputState State => _state;
 
         public void Update()
         {
-            var keyboard = Keyboard.current;
-            var mouse = Mouse.current;
-            var gamepad = Gamepad.current;
-
-            var move = Vector2.zero;
-            if (keyboard != null)
-            {
-                move += new Vector2(
-                    keyboard.aKey.isPressed ? -1f : keyboard.dKey.isPressed ? 1f : 0f,
-                    keyboard.sKey.isPressed ? -1f : keyboard.wKey.isPressed ? 1f : 0f);
-            }
-
-            if (gamepad != null)
-            {
-                move += gamepad.leftStick.ReadValue();
-            }
-
-            var look = Vector2.zero;
-            if (mouse != null)
-            {
-                look += mouse.delta.ReadValue();
-            }
-
-            if (gamepad != null)
-            {
-                look += gamepad.rightStick.ReadValue() * 20f;
-            }
+            var move = _moveAction != null ? _moveAction.ReadValue<Vector2>() : Vector2.zero;
+            var look = _lookAction != null ? _lookAction.ReadValue<Vector2>() : Vector2.zero;
 
             if (_virtualInput != null)
             {
@@ -54,13 +46,11 @@ namespace ProjectAction.Input
             move = Vector2.ClampMagnitude(move, 1f);
 
             var jumpPressed =
-                (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) ||
-                (gamepad != null && gamepad.buttonSouth.wasPressedThisFrame) ||
+                (_jumpAction != null && _jumpAction.WasPressedThisFrame()) ||
                 (_virtualInput != null && _virtualInput.JumpPressed);
 
             var sprintHeld =
-                (keyboard != null && keyboard.leftShiftKey.isPressed) ||
-                (gamepad != null && gamepad.rightTrigger.ReadValue() > 0.2f) ||
+                (_sprintAction != null && _sprintAction.IsPressed()) ||
                 (_virtualInput != null && _virtualInput.SprintHeld);
 
             _state.Move.Value = move;
@@ -73,6 +63,7 @@ namespace ProjectAction.Input
 
         public void Dispose()
         {
+            _actions?.Disable();
             _state.Dispose();
         }
     }

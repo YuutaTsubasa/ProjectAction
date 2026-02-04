@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace ProjectAction.Core
 {
@@ -9,6 +10,7 @@ namespace ProjectAction.Core
         [SerializeField] private ProjectAction.Player.PlayerController _player;
         [SerializeField] private ProjectAction.Camera.CinemachineOrbitalCamera _camera;
         [SerializeField] private ProjectAction.Input.VirtualInputBridge _virtualInput;
+        [SerializeField] private InputActionAsset _inputActions;
         [SerializeField] private Transform _spawnPoint;
 
         [Header("Death")]
@@ -24,7 +26,7 @@ namespace ProjectAction.Core
         private async UniTask Run()
         {
             var token = this.GetCancellationTokenOnDestroy();
-            var inputService = new ProjectAction.Input.InputService(_virtualInput);
+            var inputService = new ProjectAction.Input.InputService(_inputActions, _virtualInput);
             var checkpointService = new ProjectAction.Checkpoint.CheckpointService();
             System.Action goalHandler = null;
 
