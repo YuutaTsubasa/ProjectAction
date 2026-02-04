@@ -28,6 +28,11 @@
 - 低於 `RootScene` 的 `Kill Y` 視為死亡並從最近檢查點重生。
 - 進入 `Goal` 會輸出完成訊息（目前為 `Debug.Log`）。
 
+## 關卡佈置（Installer 產物）
+- 起點平台 -> 跳台階梯 -> 轉角平台 -> 直線衝刺 -> 終點平台。
+- `Checkpoint` 置於中段平台，`Goal` 置於終點平台。
+- `Checkpoint` / `Goal` 為透明黃色圓柱，觸發後會變成綠色。
+
 ## 注意事項
 - 不直接引用 PrimaryRoot 內的資產；安裝器只會建立原型方塊與必要物件。
 - 觸控虛擬搖桿僅保留 `VirtualInputBridge` 介面，尚未提供 UI。

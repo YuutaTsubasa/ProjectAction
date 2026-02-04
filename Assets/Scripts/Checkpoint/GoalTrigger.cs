@@ -16,6 +16,9 @@ namespace ProjectAction.Checkpoint
                 return;
             }
 
+            var visual = GetComponent<TriggerVisual>();
+            visual?.SetActive();
+
             Triggered?.Invoke();
         }
     }
