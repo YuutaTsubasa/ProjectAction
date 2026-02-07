@@ -1,3 +1,4 @@
+using ProjectAction.AutoAttributes;
 using ProjectAction.Core;
 using UnityEngine;
 
@@ -6,14 +7,23 @@ namespace ProjectAction.Player
     [RequireComponent(typeof(CharacterController))]
     public sealed class PlayerController : ProjectBehaviour
     {
+        private static readonly int SPEED_ID = Animator.StringToHash("Speed");
+        private static readonly int IS_GROUNDED_ID = Animator.StringToHash("IsGrounded");
+        private static readonly int VERTICAL_VELOCITY_ID = Animator.StringToHash("VerticalVelocity");
+        private static readonly int JUMP_TRIGGER_ID = Animator.StringToHash("JumpTrigger");
+        private static readonly int LAND_TRIGGER_ID = Animator.StringToHash("LandTrigger");
+        private static readonly int IS_SPRINTING_ID = Animator.StringToHash("IsSprinting");
+
         [Header("References")]
         [SerializeField] private CharacterController _controller;
         [SerializeField] private Transform _moveReference;
+        [SerializeField, GetComponent] private Animator _animator;
 
         [Header("Movement")]
         [SerializeField] private float _moveSpeed = 6f;
         [SerializeField] private float _sprintMultiplier = 1.6f;
         [SerializeField] private float _rotationSpeed = 12f;
+        [SerializeField] private float _maxMoveSpeedForAnimator = 0f;
 
         [Header("Jump")]
         [SerializeField] private float _jumpHeight = 2f;
@@ -23,6 +33,7 @@ namespace ProjectAction.Player
         private float _verticalVelocity;
         private int _jumpCount;
         private bool _loggedMissingController;
+        private bool _wasGrounded;
 
         public Transform MoveReference
         {
@@ -54,6 +65,7 @@ namespace ProjectAction.Player
             {
                 _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
                 _jumpCount++;
+                _animator?.SetTrigger(JUMP_TRIGGER_ID);
             }
 
             var moveInput = input.Move.Value;
@@ -76,6 +88,9 @@ namespace ProjectAction.Player
             _verticalVelocity += _gravity * deltaTime;
             var velocity = horizontalVelocity + Vector3.up * _verticalVelocity;
             _controller.Move(velocity * deltaTime);
+
+            UpdateAnimator(horizontalVelocity.magnitude, isGrounded, input.SprintHeld.Value);
+            _wasGrounded = isGrounded;
         }
 
         public void ResetForRespawn(Vector3 position, Quaternion rotation)
@@ -90,6 +105,30 @@ namespace ProjectAction.Player
             _controller.enabled = true;
             _verticalVelocity = 0f;
             _jumpCount = 0;
+            _wasGrounded = _controller.isGrounded;
+        }
+
+        private void UpdateAnimator(float horizontalSpeed, bool isGrounded, bool isSprinting)
+        {
+            if (_animator == null)
+            {
+                return;
+            }
+
+            var maxSpeed = _maxMoveSpeedForAnimator > 0f
+                ? _maxMoveSpeedForAnimator
+                : _moveSpeed * _sprintMultiplier;
+            var normalizedSpeed = maxSpeed > 0f ? Mathf.Clamp01(horizontalSpeed / maxSpeed) : 0f;
+
+            _animator.SetFloat(SPEED_ID, normalizedSpeed);
+            _animator.SetBool(IS_GROUNDED_ID, isGrounded);
+            _animator.SetFloat(VERTICAL_VELOCITY_ID, _verticalVelocity);
+            _animator.SetBool(IS_SPRINTING_ID, isSprinting);
+
+            if (isGrounded && !_wasGrounded)
+            {
+                _animator.SetTrigger(LAND_TRIGGER_ID);
+            }
         }
     }
 }

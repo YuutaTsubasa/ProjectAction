@@ -17,6 +17,10 @@ See `docs/AssetPolicy.md` for setup, usage, and editor toggle instructions.
 ## Auto Attributes
 `docs/AutoAttributes.md` 說明了 Auto Attributes 的使用方式（lazy resolve 與 editor 預先綁定）。
 
+## Player Animation
+- Animator parameters: `Speed` (float), `IsGrounded` (bool), `VerticalVelocity` (float), `JumpTrigger` (trigger), `LandTrigger` (trigger), `IsSprinting` (bool)
+- State outline: `Locomotion` (BlendTree), `JumpStart`, `InAir`, `Land`
+
 ### Local setup
 1. Open the project once in Unity to generate the solution and project files.
 2. One-shot format workflow (renames duplicate Player display names, restores, then formats):

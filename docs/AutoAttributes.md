@@ -1,7 +1,7 @@
 # Auto Attributes
 
 ## Purpose
-`AutoAttributes` lets fields declare where to fetch components from, then resolve lazily at first access or pre-bind in editor.
+`AutoAttributes` lets fields declare where to fetch components from, then bind automatically in `ProjectBehaviour.Awake()` or pre-bind in editor.
 
 ## Supported Attributes
 - `[GetComponent]`
