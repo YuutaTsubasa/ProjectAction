@@ -1,6 +1,6 @@
+using ProjectAction.Core;
 using Unity.Cinemachine;
 using UnityEngine;
-using ProjectAction.Core;
 
 namespace ProjectAction.Camera
 {
