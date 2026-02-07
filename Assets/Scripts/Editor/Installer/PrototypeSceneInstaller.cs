@@ -140,16 +140,10 @@ namespace ProjectAction.Editor.Installers
                 virtualInputObject.AddComponent<ProjectAction.Input.VirtualInputBridge>();
             }
 
-            var checkpoint = GameObject.Find("Checkpoint");
-            if (checkpoint == null)
-            {
-                checkpoint = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                checkpoint.name = "Checkpoint";
-                Undo.RegisterCreatedObjectUndo(checkpoint, "Create Checkpoint");
-            }
+            var checkpoint = EnsureMarkerPrimitive("Checkpoint", PrimitiveType.Cylinder);
             SetTransform(
                 checkpoint.transform,
-                new Vector3(0f, 5.5f, 27f),
+                new Vector3(0f, 5.1f, 27f),
                 Quaternion.identity,
                 new Vector3(3.5f, 2.5f, 3.5f),
                 "Update Checkpoint");
@@ -159,16 +153,10 @@ namespace ProjectAction.Editor.Installers
                 new Color(1f, 0.95f, 0.2f, 0.35f),
                 typeof(ProjectAction.Checkpoint.CheckpointTrigger));
 
-            var goal = GameObject.Find("Goal");
-            if (goal == null)
-            {
-                goal = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                goal.name = "Goal";
-                Undo.RegisterCreatedObjectUndo(goal, "Create Goal");
-            }
+            var goal = EnsureMarkerPrimitive("Goal", PrimitiveType.Cylinder);
             SetTransform(
                 goal.transform,
-                new Vector3(24f, 4.5f, 34f),
+                new Vector3(24f, 4.1f, 34f),
                 Quaternion.identity,
                 new Vector3(4.5f, 2.5f, 4.5f),
                 "Update Goal");
@@ -214,6 +202,33 @@ namespace ProjectAction.Editor.Installers
             }
 
             return courseRoot;
+        }
+
+        private static GameObject EnsureMarkerPrimitive(string name, PrimitiveType primitiveType)
+        {
+            var existing = GameObject.Find(name);
+            if (existing == null)
+            {
+                var created = GameObject.CreatePrimitive(primitiveType);
+                created.name = name;
+                Undo.RegisterCreatedObjectUndo(created, $"Create {name}");
+                return created;
+            }
+
+            var meshFilter = existing.GetComponent<MeshFilter>();
+            var meshName = meshFilter != null && meshFilter.sharedMesh != null
+                ? meshFilter.sharedMesh.name
+                : null;
+            if (string.Equals(meshName, primitiveType.ToString(), System.StringComparison.OrdinalIgnoreCase))
+            {
+                return existing;
+            }
+
+            Undo.DestroyObjectImmediate(existing);
+            var replacement = GameObject.CreatePrimitive(primitiveType);
+            replacement.name = name;
+            Undo.RegisterCreatedObjectUndo(replacement, $"Create {name}");
+            return replacement;
         }
 
         private static void BuildCourse(Transform courseRoot)
